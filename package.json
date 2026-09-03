@@ -1,0 +1,26 @@
+{
+  "name": "meowvie",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A terminal movie explorer powered by TMDB, built with Ink + React",
+  "scripts": {
+    "dev": "node --import tsx --watch src/index.tsx",
+    "start": "tsx src/index.tsx",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@lorenzopant/tmdb": "^1.25.4",
+    "figlet": "^1.11.4",
+    "ink": "^7.1.1",
+    "ink-picture": "^2.1.0",
+    "react": "^19.2.8"
+  },
+  "devDependencies": {
+    "@types/figlet": "^1.7.0",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.2.18",
+    "tsx": "^4.23.13",
+    "typescript": "^5.7.0"
+  }
+}
