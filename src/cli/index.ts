@@ -5,6 +5,8 @@ import { popular } from './commands/popular';
 import { topRated } from './commands/top-rated';
 import { nowPlaying } from './commands/now-playing';
 import { upcoming } from './commands/upcoming';
+import { movie } from './commands/movie';
+import { credits } from './commands/credits';
 import type { CliContext, CliResult } from './types';
 
 export async function runCli(argv: string[], core: Core): Promise<CliResult> {
@@ -41,6 +43,8 @@ export async function runCli(argv: string[], core: Core): Promise<CliResult> {
   topRated(program, ctx);
   nowPlaying(program, ctx);
   upcoming(program, ctx);
+  movie(program, ctx);
+  credits(program, ctx);
 
   try {
     await program.parseAsync(argv, { from: 'user' });

@@ -44,4 +44,12 @@ const r6 = await runCli(['popular'], core);
 assert(r6.exitCode === 0, 'popular 应 exit 0');
 assert(JSON.parse(r6.stdout)[0].title === 'Top Movie', 'popular 应输出榜单 JSON');
 
+const r7 = await runCli(['movie', '550'], core);
+assert(r7.exitCode === 0, 'movie 应 exit 0');
+assert(JSON.parse(r7.stdout).title === 'Detail', 'movie 应输出详情 JSON');
+
+const r8 = await runCli(['credits', '550'], core);
+assert(r8.exitCode === 0, 'credits 应 exit 0');
+assert(Array.isArray(JSON.parse(r8.stdout).cast), 'credits 应输出 cast 数组');
+
 console.log('check-cli OK');
