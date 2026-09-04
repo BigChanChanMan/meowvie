@@ -8,10 +8,11 @@
     "dev": "node --import tsx --watch src/index.tsx",
     "start": "tsx src/index.tsx",
     "typecheck": "tsc --noEmit",
-    "check": "tsx scripts/check-credits.ts"
+    "check": "tsx scripts/check-credits.ts && tsx scripts/check-cli.ts"
   },
   "dependencies": {
     "@lorenzopant/tmdb": "^1.25.4",
+    "commander": "^15.0.0",
     "figlet": "^1.11.4",
     "ink": "^7.1.1",
     "ink-picture": "^2.1.0",
