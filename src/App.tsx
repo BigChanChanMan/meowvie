@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Text, Box, useInput, useApp } from 'ink';
+import { Text, Box, useInput, useApp, useWindowSize } from 'ink';
 import { InkPictureProvider } from 'ink-picture';
-import type { MovieResultItem, MovieDetails, Language } from '@lorenzopant/tmdb';
-import { tmdb, LANGS, POSTER_PROTOCOLS, BOARDS } from './config';
-import type { PosterProtocol, BoardKey } from './config';
+import type { MovieResultItem, Language } from '@lorenzopant/tmdb';
+import { tmdb, LANGS, POSTER_PROTOCOLS, BOARDS, maxCreditsScroll } from './config';
+import type { PosterProtocol, BoardKey, Detail, DetailTab } from './config';
 import Banner from './components/Banner';
 import HUD from './components/HUD';
 import Settings from './components/Settings';
@@ -23,7 +23,9 @@ function App() {
   const [items, setItems] = useState<MovieResultItem[]>([]);
   const [listSource, setListSource] = useState<ListSource | null>(null);
   const [selected, setSelected] = useState(0);
-  const [detail, setDetail] = useState<MovieDetails | null>(null);
+  const [detail, setDetail] = useState<Detail | null>(null);
+  const [detailTab, setDetailTab] = useState<DetailTab>('overview');
+  const [creditsScroll, setCreditsScroll] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,6 +34,7 @@ function App() {
   const [settingsIndex, setSettingsIndex] = useState(0);
 
   const { exit } = useApp();
+  const { rows } = useWindowSize();
 
   const runList = async (
     title: string,
@@ -81,7 +84,15 @@ function App() {
     setBusy(true);
     setError(null);
     try {
-      setDetail(await tmdb.movies.details({ movie_id: id, language }));
+      setDetail(
+        await tmdb.movies.details<['credits']>({
+          movie_id: id,
+          language,
+          append_to_response: ['credits'],
+        }),
+      );
+      setDetailTab('overview');
+      setCreditsScroll(0);
       setView('detail');
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -140,6 +151,15 @@ function App() {
 
     if (view === 'detail') {
       if (key.return || key.escape) setView('list'); // 回到列表
+      else if (key.leftArrow || key.rightArrow) {
+        setDetailTab((t) => (t === 'overview' ? 'credits' : 'overview'));
+        setCreditsScroll(0);
+      } else if (detailTab === 'credits' && key.upArrow) {
+        setCreditsScroll((s) => Math.max(0, s - 1));
+      } else if (detailTab === 'credits' && key.downArrow && detail) {
+        const max = maxCreditsScroll(detail, rows);
+        setCreditsScroll((s) => Math.min(s + 1, max));
+      }
       return;
     }
 
@@ -188,7 +208,12 @@ function App() {
           {view === 'settings' ? (
             <Settings settingsIndex={settingsIndex} lang={lang} posterProtocol={posterProtocol} />
           ) : view === 'detail' && detail ? (
-            <MovieDetail detail={detail} posterProtocol={posterProtocol} />
+            <MovieDetail
+              detail={detail}
+              posterProtocol={posterProtocol}
+              tab={detailTab}
+              scroll={creditsScroll}
+            />
           ) : view === 'list' ? (
             <MovieList title={listTitle} items={items} selected={selected} busy={busy} />
           ) : (
