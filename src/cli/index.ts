@@ -13,6 +13,7 @@ export async function runCli(argv: string[], core: Core): Promise<CliResult> {
   let stdout = '';
   let stderr = '';
   let failure: unknown = null;
+  let usageError: string | null = null;
 
   const ctx: CliContext = {
     core,
@@ -21,6 +22,9 @@ export async function runCli(argv: string[], core: Core): Promise<CliResult> {
     },
     fail: (e) => {
       failure = e;
+    },
+    failUsage: (msg) => {
+      usageError = msg;
     },
   };
 
@@ -56,6 +60,11 @@ export async function runCli(argv: string[], core: Core): Promise<CliResult> {
       return { stdout, stderr, exitCode: 2 };
     }
     failure = err;
+  }
+
+  if (usageError !== null) {
+    stderr += `error: ${usageError}\n`;
+    return { stdout, stderr, exitCode: 2 };
   }
 
   if (failure !== null) {

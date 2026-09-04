@@ -7,6 +7,7 @@ export type CliContext = {
   core: Core;
   out: (s: string) => void;
   fail: (e: unknown) => void;
+  failUsage: (msg: string) => void;
 };
 
 export type CliResult = {
@@ -54,4 +55,26 @@ export function listCommand(
     .action((options: GlobalOptions) =>
       emitJson(ctx, ctx.core.list(key, coreParams(options)), options.pretty),
     );
+}
+
+export function idCommand(
+  program: Command,
+  ctx: CliContext,
+  name: string,
+  description: string,
+  fn: (id: number, params: CoreParams) => Promise<unknown>,
+): void {
+  program
+    .command(name)
+    .description(description)
+    .argument('<id>', 'TMDB 电影 ID', (v: string) => parseInt(v, 10))
+    .option('--language <code>', '语言（ISO 639-1，默认 zh-CN）', 'zh-CN')
+    .option('--pretty', '美化 JSON 缩进')
+    .action((id: number, options: GlobalOptions) => {
+      if (Number.isNaN(id)) {
+        ctx.failUsage('无效的电影 ID');
+        return;
+      }
+      return emitJson(ctx, fn(id, coreParams(options)), options.pretty);
+    });
 }

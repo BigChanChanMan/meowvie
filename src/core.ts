@@ -28,7 +28,10 @@ export async function movieDetail(id: number, params: CoreParams = {}): Promise<
 }
 
 export async function movieCredits(id: number, params: CoreParams = {}): Promise<MovieCredits> {
-  return (await movieDetail(id, params)).credits;
+  return client().movies.credits({
+    movie_id: id,
+    language: params.language,
+  });
 }
 
 export type Core = {
