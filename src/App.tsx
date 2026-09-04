@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Text, Box, useInput, useApp } from 'ink';
 import { InkPictureProvider } from 'ink-picture';
-import type { MovieResultItem, MovieDetails, Language } from '@lorenzopant/tmdb';
+import type { MovieResultItem, Language } from '@lorenzopant/tmdb';
 import { tmdb, LANGS, POSTER_PROTOCOLS, BOARDS } from './config';
-import type { PosterProtocol, BoardKey } from './config';
+import type { PosterProtocol, BoardKey, Detail } from './config';
 import Banner from './components/Banner';
 import HUD from './components/HUD';
 import Settings from './components/Settings';
@@ -23,7 +23,7 @@ function App() {
   const [items, setItems] = useState<MovieResultItem[]>([]);
   const [listSource, setListSource] = useState<ListSource | null>(null);
   const [selected, setSelected] = useState(0);
-  const [detail, setDetail] = useState<MovieDetails | null>(null);
+  const [detail, setDetail] = useState<Detail | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -81,7 +81,13 @@ function App() {
     setBusy(true);
     setError(null);
     try {
-      setDetail(await tmdb.movies.details({ movie_id: id, language }));
+      setDetail(
+        await tmdb.movies.details<['credits']>({
+          movie_id: id,
+          language,
+          append_to_response: ['credits'],
+        }),
+      );
       setView('detail');
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));

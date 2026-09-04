@@ -1,11 +1,10 @@
 import React from 'react';
 import { Text, Box } from 'ink';
 import Image from 'ink-picture';
-import type { MovieDetails } from '@lorenzopant/tmdb';
-import { images, starBar, fmtRuntime, YELLOW } from '../config';
-import type { PosterProtocol } from '../config';
+import { images, starBar, fmtRuntime, YELLOW, creditsLines } from '../config';
+import type { PosterProtocol, Detail } from '../config';
 
-type Props = { detail: MovieDetails; posterProtocol: PosterProtocol };
+type Props = { detail: Detail; posterProtocol: PosterProtocol };
 
 export default function MovieDetail({ detail, posterProtocol }: Props) {
   return (
@@ -52,6 +51,19 @@ export default function MovieDetail({ detail, posterProtocol }: Props) {
           </Box>
         </Box>
       </Box>
+
+      <Box marginTop={1} flexDirection="column">
+        {creditsLines(detail).length === 0 ? (
+          <Text dimColor>暂无演职员信息</Text>
+        ) : (
+          creditsLines(detail).map((line, i) => (
+            <Text key={i} wrap="truncate">
+              {line}
+            </Text>
+          ))
+        )}
+      </Box>
+
       <Box marginTop={1}>
         <Text dimColor>Esc / Enter 返回列表</Text>
       </Box>
