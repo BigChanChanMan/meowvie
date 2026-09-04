@@ -37,6 +37,7 @@ export const POSTER_PROTOCOLS = [
 export type PosterProtocol = (typeof POSTER_PROTOCOLS)[number]['id'];
 
 export type Detail = MovieDetailsWithAppends<['credits']>;
+export type DetailTab = 'overview' | 'credits';
 
 export const BOARDS = [
   { key: 'popular', label: '热门电影' },

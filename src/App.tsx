@@ -3,7 +3,7 @@ import { Text, Box, useInput, useApp } from 'ink';
 import { InkPictureProvider } from 'ink-picture';
 import type { MovieResultItem, Language } from '@lorenzopant/tmdb';
 import { tmdb, LANGS, POSTER_PROTOCOLS, BOARDS } from './config';
-import type { PosterProtocol, BoardKey, Detail } from './config';
+import type { PosterProtocol, BoardKey, Detail, DetailTab } from './config';
 import Banner from './components/Banner';
 import HUD from './components/HUD';
 import Settings from './components/Settings';
@@ -24,6 +24,7 @@ function App() {
   const [listSource, setListSource] = useState<ListSource | null>(null);
   const [selected, setSelected] = useState(0);
   const [detail, setDetail] = useState<Detail | null>(null);
+  const [detailTab, setDetailTab] = useState<DetailTab>('overview');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -88,6 +89,7 @@ function App() {
           append_to_response: ['credits'],
         }),
       );
+      setDetailTab('overview');
       setView('detail');
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -146,6 +148,9 @@ function App() {
 
     if (view === 'detail') {
       if (key.return || key.escape) setView('list'); // 回到列表
+      else if (key.leftArrow || key.rightArrow) {
+        setDetailTab((t) => (t === 'overview' ? 'credits' : 'overview'));
+      }
       return;
     }
 
@@ -194,7 +199,7 @@ function App() {
           {view === 'settings' ? (
             <Settings settingsIndex={settingsIndex} lang={lang} posterProtocol={posterProtocol} />
           ) : view === 'detail' && detail ? (
-            <MovieDetail detail={detail} posterProtocol={posterProtocol} />
+            <MovieDetail detail={detail} posterProtocol={posterProtocol} tab={detailTab} />
           ) : view === 'list' ? (
             <MovieList title={listTitle} items={items} selected={selected} busy={busy} />
           ) : (
