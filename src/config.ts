@@ -65,6 +65,7 @@ export function fmtRuntime(min?: number): string {
   return `${Math.floor(min / 60)}h ${min % 60}m`;
 }
 
+export const CREDITS_VIEWPORT = 16; // ponytail: 固定滚动窗口，小终端放不下时再按 stdout.rows 计算
 const CAST_LIMIT = 10;
 
 export function creditsLines(detail: Detail): string[] {

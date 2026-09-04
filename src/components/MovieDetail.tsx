@@ -1,17 +1,17 @@
 import React from 'react';
 import { Text, Box } from 'ink';
 import Image from 'ink-picture';
-import { images, starBar, fmtRuntime, YELLOW, creditsLines } from '../config';
+import { images, starBar, fmtRuntime, YELLOW, creditsLines, CREDITS_VIEWPORT } from '../config';
 import type { PosterProtocol, Detail, DetailTab } from '../config';
 
-type Props = { detail: Detail; posterProtocol: PosterProtocol; tab: DetailTab };
+type Props = { detail: Detail; posterProtocol: PosterProtocol; tab: DetailTab; scroll: number };
 
 const TABS: { key: DetailTab; label: string }[] = [
   { key: 'overview', label: '简介' },
   { key: 'credits', label: '演职员表' },
 ];
 
-export default function MovieDetail({ detail, posterProtocol, tab }: Props) {
+export default function MovieDetail({ detail, posterProtocol, tab, scroll }: Props) {
   return (
     <Box flexDirection="column">
       <Box marginBottom={1}>
@@ -27,11 +27,11 @@ export default function MovieDetail({ detail, posterProtocol, tab }: Props) {
       {tab === 'overview' ? (
         <Overview detail={detail} posterProtocol={posterProtocol} />
       ) : (
-        <Credits detail={detail} />
+        <Credits detail={detail} scroll={scroll} />
       )}
 
       <Box marginTop={1}>
-        <Text dimColor>←→ 切换面板 · Esc/Enter 返回列表</Text>
+        <Text dimColor>←→ 切换面板 · ↑↓ 滚动 · Esc/Enter 返回列表</Text>
       </Box>
     </Box>
   );
@@ -84,14 +84,15 @@ function Overview({ detail, posterProtocol }: { detail: Detail; posterProtocol: 
   );
 }
 
-function Credits({ detail }: { detail: Detail }) {
+function Credits({ detail, scroll }: { detail: Detail; scroll: number }) {
   const lines = creditsLines(detail);
+  const visible = lines.slice(scroll, scroll + CREDITS_VIEWPORT);
   return (
     <Box flexDirection="column">
-      {lines.length === 0 ? (
+      {visible.length === 0 ? (
         <Text dimColor>暂无演职员信息</Text>
       ) : (
-        lines.map((line, i) => (
+        visible.map((line, i) => (
           <Text key={i} wrap="truncate">
             {line}
           </Text>

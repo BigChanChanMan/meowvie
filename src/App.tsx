@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Text, Box, useInput, useApp } from 'ink';
 import { InkPictureProvider } from 'ink-picture';
 import type { MovieResultItem, Language } from '@lorenzopant/tmdb';
-import { tmdb, LANGS, POSTER_PROTOCOLS, BOARDS } from './config';
+import { tmdb, LANGS, POSTER_PROTOCOLS, BOARDS, CREDITS_VIEWPORT, creditsLines } from './config';
 import type { PosterProtocol, BoardKey, Detail, DetailTab } from './config';
 import Banner from './components/Banner';
 import HUD from './components/HUD';
@@ -25,6 +25,7 @@ function App() {
   const [selected, setSelected] = useState(0);
   const [detail, setDetail] = useState<Detail | null>(null);
   const [detailTab, setDetailTab] = useState<DetailTab>('overview');
+  const [creditsScroll, setCreditsScroll] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -90,6 +91,7 @@ function App() {
         }),
       );
       setDetailTab('overview');
+      setCreditsScroll(0);
       setView('detail');
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -150,6 +152,12 @@ function App() {
       if (key.return || key.escape) setView('list'); // 回到列表
       else if (key.leftArrow || key.rightArrow) {
         setDetailTab((t) => (t === 'overview' ? 'credits' : 'overview'));
+        setCreditsScroll(0);
+      } else if (detailTab === 'credits' && key.upArrow) {
+        setCreditsScroll((s) => Math.max(0, s - 1));
+      } else if (detailTab === 'credits' && key.downArrow && detail) {
+        const max = Math.max(0, creditsLines(detail).length - CREDITS_VIEWPORT);
+        setCreditsScroll((s) => Math.min(s + 1, max));
       }
       return;
     }
@@ -199,7 +207,12 @@ function App() {
           {view === 'settings' ? (
             <Settings settingsIndex={settingsIndex} lang={lang} posterProtocol={posterProtocol} />
           ) : view === 'detail' && detail ? (
-            <MovieDetail detail={detail} posterProtocol={posterProtocol} tab={detailTab} />
+            <MovieDetail
+              detail={detail}
+              posterProtocol={posterProtocol}
+              tab={detailTab}
+              scroll={creditsScroll}
+            />
           ) : view === 'list' ? (
             <MovieList title={listTitle} items={items} selected={selected} busy={busy} />
           ) : (
