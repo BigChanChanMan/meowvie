@@ -1,6 +1,10 @@
 import { Command, CommanderError } from 'commander';
 import type { Core } from '../core';
 import { search } from './commands/search';
+import { popular } from './commands/popular';
+import { topRated } from './commands/top-rated';
+import { nowPlaying } from './commands/now-playing';
+import { upcoming } from './commands/upcoming';
 import type { CliContext, CliResult } from './types';
 
 export async function runCli(argv: string[], core: Core): Promise<CliResult> {
@@ -33,6 +37,10 @@ export async function runCli(argv: string[], core: Core): Promise<CliResult> {
     });
 
   search(program, ctx);
+  popular(program, ctx);
+  topRated(program, ctx);
+  nowPlaying(program, ctx);
+  upcoming(program, ctx);
 
   try {
     await program.parseAsync(argv, { from: 'user' });

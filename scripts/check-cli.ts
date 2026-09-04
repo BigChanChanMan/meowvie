@@ -40,4 +40,8 @@ const r5 = await runCli(['search', 'x'], failCore);
 assert(r5.exitCode === 1, `运行错误应 exit 1，实际 ${r5.exitCode}`);
 assert(r5.stderr.includes('boom'), 'stderr 应包含错误信息');
 
+const r6 = await runCli(['popular'], core);
+assert(r6.exitCode === 0, 'popular 应 exit 0');
+assert(JSON.parse(r6.stdout)[0].title === 'Top Movie', 'popular 应输出榜单 JSON');
+
 console.log('check-cli OK');
