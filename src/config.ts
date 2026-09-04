@@ -65,7 +65,7 @@ export function fmtRuntime(min?: number): string {
   return `${Math.floor(min / 60)}h ${min % 60}m`;
 }
 
-export const CREDITS_VIEWPORT = 16; // ponytail: 固定滚动窗口，小终端放不下时再按 stdout.rows 计算
+const CREDITS_OVERHEAD = 16; // 终端固定 UI 占位（banner/HUD/标签/边框/提示），可视高度 = 行数 − 此值
 const CAST_LIMIT = 10;
 
 export function creditsLines(detail: Detail): string[] {
@@ -84,10 +84,23 @@ export function creditsLines(detail: Detail): string[] {
   if (cast.length > 0) {
     lines.push('');
     lines.push('演员：');
-    for (const c of cast.slice(0, CAST_LIMIT)) {
+    const top = [...cast].sort((a, b) => a.order - b.order).slice(0, CAST_LIMIT);
+    for (const c of top) {
       lines.push(`  ${c.name}${c.character ? ` — ${c.character}` : ''}`);
     }
   }
 
   return lines;
+}
+
+export function creditsViewport(rows: number): number {
+  return Math.max(4, rows - CREDITS_OVERHEAD);
+}
+
+export function maxCreditsScroll(detail: Detail, rows: number): number {
+  return Math.max(0, creditsLines(detail).length - creditsViewport(rows));
+}
+
+export function visibleCredits(detail: Detail, scroll: number, rows: number): string[] {
+  return creditsLines(detail).slice(scroll, scroll + creditsViewport(rows));
 }

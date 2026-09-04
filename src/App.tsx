@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Text, Box, useInput, useApp } from 'ink';
+import { Text, Box, useInput, useApp, useWindowSize } from 'ink';
 import { InkPictureProvider } from 'ink-picture';
 import type { MovieResultItem, Language } from '@lorenzopant/tmdb';
-import { tmdb, LANGS, POSTER_PROTOCOLS, BOARDS, CREDITS_VIEWPORT, creditsLines } from './config';
+import { tmdb, LANGS, POSTER_PROTOCOLS, BOARDS, maxCreditsScroll } from './config';
 import type { PosterProtocol, BoardKey, Detail, DetailTab } from './config';
 import Banner from './components/Banner';
 import HUD from './components/HUD';
@@ -34,6 +34,7 @@ function App() {
   const [settingsIndex, setSettingsIndex] = useState(0);
 
   const { exit } = useApp();
+  const { rows } = useWindowSize();
 
   const runList = async (
     title: string,
@@ -156,7 +157,7 @@ function App() {
       } else if (detailTab === 'credits' && key.upArrow) {
         setCreditsScroll((s) => Math.max(0, s - 1));
       } else if (detailTab === 'credits' && key.downArrow && detail) {
-        const max = Math.max(0, creditsLines(detail).length - CREDITS_VIEWPORT);
+        const max = maxCreditsScroll(detail, rows);
         setCreditsScroll((s) => Math.min(s + 1, max));
       }
       return;

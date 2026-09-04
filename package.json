@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "node --import tsx --watch src/index.tsx",
     "start": "tsx src/index.tsx",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "check": "tsx scripts/check-credits.ts"
   },
   "dependencies": {
     "@lorenzopant/tmdb": "^1.25.4",

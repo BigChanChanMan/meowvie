@@ -1,7 +1,7 @@
 import React from 'react';
-import { Text, Box } from 'ink';
+import { Text, Box, useWindowSize } from 'ink';
 import Image from 'ink-picture';
-import { images, starBar, fmtRuntime, YELLOW, creditsLines, CREDITS_VIEWPORT } from '../config';
+import { images, starBar, fmtRuntime, YELLOW, visibleCredits } from '../config';
 import type { PosterProtocol, Detail, DetailTab } from '../config';
 
 type Props = { detail: Detail; posterProtocol: PosterProtocol; tab: DetailTab; scroll: number };
@@ -85,8 +85,8 @@ function Overview({ detail, posterProtocol }: { detail: Detail; posterProtocol: 
 }
 
 function Credits({ detail, scroll }: { detail: Detail; scroll: number }) {
-  const lines = creditsLines(detail);
-  const visible = lines.slice(scroll, scroll + CREDITS_VIEWPORT);
+  const { rows } = useWindowSize();
+  const visible = visibleCredits(detail, scroll, rows);
   return (
     <Box flexDirection="column">
       {visible.length === 0 ? (
