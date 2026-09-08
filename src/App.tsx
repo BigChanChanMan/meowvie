@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Text, Box, useInput, useApp, useWindowSize } from 'ink';
 import { InkPictureProvider } from 'ink-picture';
 import type { MovieResultItem, Language } from '@lorenzopant/tmdb';
-import { tmdb, LANGS, POSTER_PROTOCOLS, BOARDS, maxCreditsScroll } from './config';
+import { LANGS, POSTER_PROTOCOLS, BOARDS, maxCreditsScroll } from './config';
 import type { PosterProtocol, BoardKey, Detail, DetailTab } from './config';
+import { core } from './core';
 import Banner from './components/Banner';
 import HUD from './components/HUD';
 import Settings from './components/Settings';
@@ -41,10 +42,6 @@ function App() {
     fetcher: (language: Language) => Promise<MovieResultItem[]>,
     language: Language,
   ) => {
-    if (!tmdb) {
-      setError('未配置 TMDB_ACCESS_TOKEN（编辑 .env 文件）');
-      return;
-    }
     setError(null);
     setBusy(true);
     setListTitle(title);
@@ -64,7 +61,7 @@ function App() {
     setListSource({ type: 'search', query: q });
     void runList(
       `结果（${q}）`,
-      (l) => tmdb!.search.movies({ query: q, language: l }).then((r) => r.results.slice(0, 8)),
+      (l) => core.search(q, { language: l }).then((results) => results.slice(0, 8)),
       language,
     );
   };
@@ -74,23 +71,16 @@ function App() {
     const label = BOARDS.find((b) => b.key === key)!.label;
     void runList(
       `📊 ${label}`,
-      (l) => tmdb!.movie_lists[key]({ language: l }).then((r) => r.results.slice(0, 10)),
+      (l) => core.list(key, { language: l }).then((results) => results.slice(0, 10)),
       language,
     );
   };
 
   const openDetail = async (id: number, language: Language) => {
-    if (!tmdb) return;
     setBusy(true);
     setError(null);
     try {
-      setDetail(
-        await tmdb.movies.details<['credits']>({
-          movie_id: id,
-          language,
-          append_to_response: ['credits'],
-        }),
-      );
+      setDetail(await core.movie(id, { language }));
       setDetailTab('overview');
       setCreditsScroll(0);
       setView('detail');
